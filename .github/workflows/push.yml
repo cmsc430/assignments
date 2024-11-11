@@ -26,9 +26,14 @@ jobs:
       run: |
         nasm --version
         gcc --version
-    - name: Install langs package
+    - name: Install assignments package
       run: |
         raco pkg install --auto ../assignments/
+    - name: Archive knock-plus
+      uses: actions/upload-pages-artifact@v3
+      with:
+        name: knock-plus
+        path: knock-plus
     - name: Run tests
       run: |
         raco test knock-plus/test/interp.rkt # all should pass
