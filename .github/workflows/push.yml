@@ -32,4 +32,4 @@ jobs:
     - name: Run tests
       run: |
         raco test assignments/knock-plus/test/interp.rkt # all should pass
-	raco test assignments/knock-plus/test/compile.rkt 2>&1 | grep 'failures' # should not pass
+        raco test assignments/knock-plus/test/compile.rkt 2>&1 | grep 'failures' # should not pass
