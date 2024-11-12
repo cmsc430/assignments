@@ -40,7 +40,7 @@ jobs:
         mkdir zips/
         zip zips/knock-plus.zip `git ls-files knock-plus`
     - name: Archive zips
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: zips
         path: zips
