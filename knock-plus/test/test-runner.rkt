@@ -269,7 +269,7 @@
                        '(match #f
                           [(? always?) 1]
                           [_ 2]))
-                  2)
+                  1)
     (check-equal? (run '(define (id x) x)
                        '(match #t
                           [(and (? id) y) y]
