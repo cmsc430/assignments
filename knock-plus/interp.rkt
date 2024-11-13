@@ -135,6 +135,7 @@
        [(Defn f (list x) e)
         (match (interp-env e (list (list x v)) ds)
           ['err 'err]
+          [#f #f]
           [v r])]
        [_ 'err])]     
     [(Vect ps)

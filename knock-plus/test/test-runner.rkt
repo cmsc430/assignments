@@ -259,7 +259,27 @@
     (check-equal? (run '(match (vector 1 2 3)
                           [(list x y z) #f]
                           [_ #t]))
-                  #t)))
+                  #t)
+    (check-equal? (run '(define (never? x) #f)
+                       '(match #t
+                          [(? never?) 1]
+                          [_ 2]))
+                  2)
+    (check-equal? (run '(define (always? x) #t)
+                       '(match #f
+                          [(? always?) 1]
+                          [_ 2]))
+                  1)
+    (check-equal? (run '(define (id x) x)
+                       '(match #t
+                          [(and (? id) y) y]
+                          [_ 2]))
+                  #t)
+    (check-equal? (run '(define (id x) x)
+                       '(match #f
+                          [(and (? id) y) y]
+                          [_ 2]))
+                  2)))
 
 (define (test/io run)
   (begin ;; Evildoer
