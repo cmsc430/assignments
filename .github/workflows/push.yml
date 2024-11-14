@@ -33,7 +33,7 @@ jobs:
         raco pkg install --auto ../assignments/
     - name: Run tests
       run: |
-        raco test knock-plus/test/interp.rkt # all should pass
+        raco test --pkgs assignments
         raco test knock-plus/test/compile.rkt 2>&1 | grep 'failures' # should not pass
     - name: Create zips
       run: |
