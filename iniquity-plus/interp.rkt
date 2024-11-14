@@ -1,7 +1,6 @@
 #lang racket
 (provide interp)
 (provide interp-env)
-(provide interp-match-pat)
 (require "ast.rkt")
 (require "interp-prim.rkt")
 
@@ -48,11 +47,6 @@
              [v2 (match (interp-env e3 r ds)
                    ['err 'err]
                    [v3 (interp-prim3 p v1 v2 v3)])])])]
-    [(PrimN pN es)
-     (match (interp-env* es r ds)
-       ['err 'err]
-       [vs
-        (interp-primN pN vs)])]
     [(If e0 e1 e2)
      (match (interp-env e0 r ds)
        ['err 'err]
@@ -73,16 +67,20 @@
        ['err 'err]
        [vs
         (match (defns-lookup ds f)
-          [(Defn f xs e)
-           ; check arity matches
-           (if (= (length xs) (length vs))
-               (interp-env e (zip xs vs) ds)
-               'err)])])]
-    [(Match e ps es)
-     (match (interp-env e r ds)
+          [(Defn _ fun)
+           (apply-fun fun vs ds)])])]
+    [(Apply f es e)
+     (match (interp-env* es r ds)
        ['err 'err]
-       [v
-        (interp-match v ps es r ds)])]))
+       [vs
+        (match (interp-env e r ds)
+          ['err 'err]
+          [ws
+           (if (list? ws)
+               (match (defns-lookup ds f)
+                 [(Defn _ fun)
+                  (apply-fun fun (append vs ws) ds)])
+               'err)])])]))
 
 ;; (Listof Expr) REnv Defns -> (Listof Value) | 'err
 (define (interp-env* es r ds)
@@ -95,67 +93,44 @@
             ['err 'err]
             [vs (cons v vs)])])]))
 
-;; Value [Listof Pat] [Listof Expr] Env Defns -> Answer
-(define (interp-match v ps es r ds)
-  (match* (ps es)
-    [('() '()) 'err]
-    [((cons p ps) (cons e es))
-     (match (interp-match-pat p v r ds)
-       [#f (interp-match v ps es r ds)]
+;; Fun [Listof Values] Defns -> Answer
+(define (apply-fun f vs ds)
+  (match f
+    [(FunPlain xs e)
+     ; check arity matches-arity-exactly?
+     (if (= (length xs) (length vs))
+         (interp-env e (zip xs vs) ds)
+         'err)]
+    [(FunRest xs x e)
+     ; check arity is acceptable
+     (if (< (length vs) (length xs))
+         'err
+           (interp-env e
+                       (zip (cons x xs)
+                            (cons (drop vs (length xs))
+                                  (take vs (length xs))))
+                       ds))]
+    [(FunCase cs)
+     (match (select-case-lambda cs (length vs))
        ['err 'err]
-       [r  (interp-env e r ds)])]))
-;; Pat Value Env Defns -> [Maybe Env] | 'err
-(define (interp-match-pat p v r ds)
-  (match p
-    [(Var '_) r]
-    [(Var x) (ext r x v)]
-    [(Lit l) (and (eqv? l v) r)]
-    [(Box p)
-     (match v
-       [(box v)
-        (interp-match-pat p v r ds)]
-       [_ #f])]
-    [(Cons p1 p2)
-     (match v
-       [(cons v1 v2)
-        (match (interp-match-pat p1 v1 r ds)
-          [#f #f]
-          ['err 'err]
-          [r1 (interp-match-pat p2 v2 r1 ds)])]
-       [_ #f])]
-    [(Conj p1 p2)
-     (match (interp-match-pat p1 v r ds)
-       [#f #f]
-       ['err 'err]
-       [r1 (interp-match-pat p2 v r1 ds)])]
-    [(List ps)
-     (interp-match-pat-list ps v r ds)]
-    [(Pred f)
-     (match (defns-lookup ds f)
-       [(Defn f (list x) e)
-        (match (interp-env e (list (list x v)) ds)
-          ['err 'err]
-          [#f #f]
-          [v r])]
-       [_ 'err])]
-    [(Vect ps)
-     (and (vector? v)
-          (interp-match-pat-list ps (vector->list v) r ds))]))
+       [f (apply-fun f vs ds)])]))
 
-;; [Listof Pat] Value Env Defns -> [Maybe Env] | 'err
-(define (interp-match-pat-list ps v r ds)
-  (match (cons ps v)
-    [(cons '() '()) r]
-    [(cons (cons p ps) (cons v vs))
-     (match (interp-match-pat p v r ds)
-       [#f #f]
-       ['err 'err]
-       [r (interp-match-pat-list ps vs r ds)])]
-    [_ #f]))
+;; [Listof FunCaseClause] Nat -> Fun | 'err
+(define (select-case-lambda cs n)
+  (match cs
+    ['() 'err]
+    [(cons (and (FunPlain xs e) f) cs)
+     (if (= (length xs) n)
+         f
+         (select-case-lambda cs n))]
+    [(cons (and (FunRest xs x e) f) cs)
+     (if (<= (length xs) n)
+         f
+         (select-case-lambda cs n))]))
 
 ;; Defns Symbol -> Defn
 (define (defns-lookup ds f)
-  (findf (match-lambda [(Defn g _ _) (eq? f g)])
+  (findf (match-lambda [(Defn g _) (eq? f g)])
          ds))
 
 (define (zip xs ys)
