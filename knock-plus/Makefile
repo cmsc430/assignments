@@ -1,4 +1,5 @@
 UNAME := $(shell uname)
+.PHONY: test submit.zip
 
 ifeq ($(UNAME), Darwin)
   format=macho64
