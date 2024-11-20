@@ -172,6 +172,7 @@
     (seq (Lea rax r)
          (Push rax)
          (compile-es es (cons #f c))
+         ;; TODO: communicate argument count to called function
          (Jmp (symbol->label f))
          (Label r))))
 
