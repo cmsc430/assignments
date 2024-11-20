@@ -1,5 +1,5 @@
 #lang racket
-(provide compile-op0 compile-op1 compile-op2 compile-op3 pad-stack)
+(provide compile-op0 compile-op1 compile-op2 compile-op3 pad-stack assert-cons)
 (require "ast.rkt")
 (require "types.rkt")
 (require a86/ast)
