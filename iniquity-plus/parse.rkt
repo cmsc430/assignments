@@ -69,7 +69,6 @@
           [(list ys gs (Prog ds e))
            (list ys gs (Prog (cons d ds) e))])])]))
 
-
 ;; S-Expr [Listof Id] [Listof Id] [Listof Id] [Listof Id] -> (list [Listof Id] [Listof Id] Defn)
 ;;   s: definition shaped s-expr to be parsed
 ;;   fs: defined function names
@@ -213,6 +212,7 @@
            (list ys gs (cons e es))])])]
     [_ (error "parse error")]))
 
+;; [Listof Any] -> Boolean
 (define (distinct? xs)
   (not (check-duplicates xs)))
 
@@ -223,12 +223,12 @@
     [(cons x xs) (and (p? x) (all p? xs))]
     [x (p? x)]))
 
-;; [Listof Any] -> (Any -> Boolean)
-(define (not-in m)
-  (λ (x) (not (memq x m))))
+;; xs:[Listof Any] -> p:(x:Any -> Boolean)
+;; Produce a predicate p for things not in xs
+(define (not-in xs)
+  (λ (x) (not (memq x xs))))
 (define (in m)
   (λ (x) (memq x m)))
-
 
 ;; Any -> Boolean
 (define (datum? x)

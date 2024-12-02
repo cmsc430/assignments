@@ -257,15 +257,16 @@
            (list ys xs gs (cons p ps))])])]
     [_ (error "match: bad syntax")]))
 
+;; [Listof Any] -> Boolean
 (define (distinct? xs)
   (not (check-duplicates xs)))
 
-;; [Listof Any] -> (Any -> Boolean)
-(define (not-in m)
-  (λ (x) (not (memq x m))))
+;; xs:[Listof Any] -> p:(x:Any -> Boolean)
+;; Produce a predicate p for things not in xs
+(define (not-in xs)
+  (λ (x) (not (memq x xs))))
 (define (in m)
   (λ (x) (memq x m)))
-
 
 ;; Any -> Boolean
 (define (datum? x)
