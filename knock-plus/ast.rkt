@@ -22,6 +22,8 @@
 ;;           | (App Id (Listof Expr))
 ;;           | (Match Expr (Listof Pat) (Listof Expr))
 
+;; type ClosedExpr = { e ∈ Expr | e contains no free variables }
+
 ;; type Id  = Symbol
 ;; type Datum = Integer
 ;;            | Boolean
