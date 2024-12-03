@@ -71,6 +71,8 @@
                 (p (Match (Lit 1) (list (Var 'x)) (list (Var 'x)))))
   (check-equal? (parse '(match 1 [x y]))
                 (p (Match (Lit 1) (list (Var 'x)) (list (Var 'y)))))
+  (check-equal? (parse '(match x ['() 1]))
+                (p (Match (Var 'x) (list (Lit '())) (list (Lit 1)))))
   (check-exn exn:fail? (λ () (parse-closed '(match 1 [x y])))))
 (begin ; Knock+
   (check-equal? (parse '(match 1 [(? f?) #t]))
