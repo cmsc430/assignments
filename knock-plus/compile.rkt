@@ -1,5 +1,11 @@
 #lang racket
-(provide (all-defined-out))
+(provide compile
+         compile-e
+         compile-es
+         compile-define
+         compile-match
+         compile-match-clause)
+
 (require "ast.rkt")
 (require "compile-ops.rkt")
 (require "types.rkt")
@@ -270,8 +276,7 @@
                 (Add rsp (* 8 (length cm))) ; haven't pushed anything yet
                 (Jmp next)
                 (Label ok)
-                (Xor rax type-box)
-                (Mov rax (Offset rax 0))
+                (Mov rax (Offset rax (- type-box)))
                 i1)
            cm1))])]
     [(Cons p1 p2)
