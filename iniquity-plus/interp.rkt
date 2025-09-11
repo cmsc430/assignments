@@ -3,6 +3,7 @@
 (provide interp-env)
 (require "ast.rkt")
 (require "interp-prim.rkt")
+(require "env.rkt")
 
 ;; type Value =
 ;; | Integer
@@ -15,6 +16,8 @@
 ;; | (box Value)
 ;; | (string Character ...)
 ;; | (vector Value ...)
+
+;; type Answer = Value | 'err
 
 ;; type Env = (Listof (List Id Value))
 ;; Prog -> Answer
@@ -139,16 +142,4 @@
     [((cons x xs) (cons y ys))
      (cons (list x y)
            (zip xs ys))]))
-
-;; Env Id -> Value
-(define (lookup r x)
-  (match r
-    [(cons (list y val) r)
-     (if (symbol=? x y)
-         val
-         (lookup r x))]))
-
-;; Env Id Value -> Env
-(define (ext r x v)
-  (cons (list x v) r))
 
