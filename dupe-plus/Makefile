@@ -13,9 +13,9 @@ objs = \
 	print.o \
 	values.o
 
-default: submit.zip
+.DEFAULT_GOAL: submit.zip
 
-submit.zip:
+submit.zip: $(shell find . -name "*.rkt" -o -name "*.c")
 	zip submit.zip -r * \
 		-x \*.[os] -x \*~ -x \*zip \
 		-x \*Zone.Identifier -x \*\*compiled\*\*
