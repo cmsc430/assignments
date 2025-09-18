@@ -32,6 +32,10 @@
     [(Prim1 p e) (compile-prim1 p e)]
     [(If e1 e2 e3)
      (compile-if e1 e2 e3)]
+    [(Cond eqs eas el) ;; TODO
+     (seq)]
+    [(Case e ds es el) ;; TODO
+     (seq)]
     [(Begin e1 e2)
      (compile-begin e1 e2)]))
 

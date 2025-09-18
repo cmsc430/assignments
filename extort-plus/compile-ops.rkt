@@ -25,6 +25,15 @@
      (seq (assert-integer rax)
           (Cmp rax 0)
           if-equal)]
+    ['abs
+     ;; TODO
+     (seq)]
+    ['-
+     ;; TODO
+     (seq)]
+    ['not
+     ;; TODO
+     (seq)]
     ['char?
      (seq (And rax mask-char)
           (Cmp rax type-char)
