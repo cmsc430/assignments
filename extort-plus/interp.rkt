@@ -22,6 +22,12 @@
      (match (interp e)
        ['err 'err]
        [v (interp-prim1 p v)])]
+    [(Cond eqs eas el)
+     ;; TODO
+     0]
+    [(Case e ds es el)
+     ;; TODO
+     0]
     [(If e1 e2 e3)
      (match (interp e1)
        ['err 'err]

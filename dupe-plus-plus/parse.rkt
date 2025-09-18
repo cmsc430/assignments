@@ -57,8 +57,7 @@
 
 ;; S-Expr -> Datum
 (define (parse-datum s)
-  (if (or (integer? s)
-          (boolean? s))
+  (if (datum? s)
       s
       (error "parse error: not a datum")))
 
