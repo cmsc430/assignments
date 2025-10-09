@@ -2,36 +2,6 @@
 (provide parse parse-closed)
 (require "ast.rkt")
 
-;; S-Expr -> Cond
-(define (parse-cond s)
-  (match s
-    [(list (list 'else s)) (Cond '() '() (parse s))]
-    [(cons (list s1 s2) sr)
-     (match (parse-cond sr)
-       [(Cond qs es e)
-        (Cond (cons (parse s1) qs) (cons (parse s2) es) e)])]
-    [_ (error "parse error")]))
-
-;; S-Expr -> Case
-(define (parse-case s)
-  (match s
-    [(cons s sr)
-     (parse-case-clauses s sr)]
-    [_
-     (error "parse error")]))
-
-;; S-Expr S-Expr -> Case
-(define (parse-case-clauses s sr)
-  (match sr
-    [(list (list 'else s2)) (Case (parse s) '() '() (parse s2))]
-    [(cons (list d1 s1) sr)
-     (match (parse-case-clauses s sr)
-       [(Case e ds es el)
-        (Case e
-              (cons (map parse-datum d1) ds)
-              (cons (parse s1) es)
-              el)])]))
-
 ;; S-Expr -> Datum
 (define (parse-datum s)
   (if (datum? s)
@@ -70,6 +40,10 @@
           (parse-let* sr bvs fvs)]
          ['let
           (parse-let sr bvs fvs)]
+         ['cond
+          (parse-cond sr bvs fvs)]
+         ['case
+          (parse-case sr bvs fvs)]
          [_
           (match (parse-es/acc sr bvs fvs)
             [(list fvs es)
@@ -99,6 +73,52 @@
           (rec (list sr sb) (cons x xs) (cons e1 es) fvs)])]
       [_ (error "let: bad syntax" s)]))
   (rec s '() '() fvs))
+
+
+;; S-Expr [Listof Id] [Listof Id] -> (list [Listof Id] Cond)
+(define (parse-cond s bvs fvs)
+  (match s
+    [(list (list (and 'else (? (not-in bvs) 'else)) s))
+     (match (parse/acc s bvs fvs)
+       [(list fvs e)
+        (list fvs (Cond '() '() e))])]
+    [(cons (list s1 s2) sr)
+     (match (parse-cond sr bvs fvs)
+       [(list fvs (Cond qs es e))
+        (match (parse/acc s1 bvs fvs)
+          [(list fvs e1)
+           (match (parse/acc s2 bvs fvs)
+             [(list fvs e2)
+              (list fvs (Cond (cons e1 qs) (cons e2 es) e))])])])]
+    [_ (error "parse error")]))
+
+;; S-Expr [Listof Id] [Listof Id] -> (list [Listof Id] Case)
+(define (parse-case s bvs fvs)
+  (match s
+    [(cons s sr)
+     (parse-case-clauses s sr bvs fvs)]
+    [_
+     (error "parse error")]))
+
+;; S-Expr S-Expr [Listof Id] [Listof Id] -> (list [Listof Id] Case)
+(define (parse-case-clauses s sr bvs fvs)
+  (match sr
+    [(list (list (and 'else (? (not-in bvs) 'else)) s2))
+     (match (parse/acc s bvs fvs)
+       [(list fvs e)
+        (match (parse/acc s2 bvs fvs)
+          [(list fvs e2)
+           (list fvs (Case e '() '() e2))])])]
+    [(cons (list d1 s1) sr)
+     (match (parse/acc s1 bvs fvs)
+       [(list fvs e1)
+        (match (parse-case-clauses s sr bvs fvs)
+          [(list fvs (Case e ds es el))
+           (list fvs
+                 (Case e
+                       (cons (map parse-datum d1) ds)
+                       (cons e1 es)
+                       el))])])]))
 
 ;; s:S-Expr bvs:[Listof Id] fvs:[Listof Id] ->
 ;;   -> (list fvs-e:[Listof Id] e:Expr)
@@ -148,6 +168,7 @@
 
 (define (op1? x)
   (memq x '(add1 sub1 zero? abs - not
+                 integer? boolean?
                  char? integer->char char->integer
                  write-byte eof-object?)))
 
