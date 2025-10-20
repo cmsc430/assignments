@@ -1,6 +1,5 @@
 #lang racket
 (provide interp)
-(provide interp-env)
 (require "ast.rkt")
 (require "interp-prim.rkt")
 (require "env.rkt")
@@ -20,79 +19,66 @@
 ;; type Answer = Value | 'err
 
 ;; type Env = (Listof (List Id Value))
+
+(define (err? x) (eq? x 'err))
+;; ClosedExpr -> Answer
 ;; Prog -> Answer
 (define (interp p)
-  (match p
-    [(Prog ds e)
-     (interp-env e '() ds)]))
-;; Expr Env Defns -> Answer
-(define (interp-env e r ds)
+  (with-handlers ([err? identity])
+    (match p
+      [(Prog ds e)
+       (interp-e e '() ds)])))
+;l Expr Env Defns -> Value { raises 'err }
+(define (interp-e e r ds) ;; where r closes e
   (match e
+    [(Var x) (lookup r x)]
     [(Lit d) d]
     [(Eof)   eof]
-    [(Var x) (lookup r x)]
-    [(Prim0 p) (interp-prim0 p)]
+    [(Prim0 p)
+     (interp-prim0 p)]
     [(Prim1 p e)
-     (match (interp-env e r ds)
-       ['err 'err]
-       [v (interp-prim1 p v)])]
+     (interp-prim1 p (interp-e e r ds))]
     [(Prim2 p e1 e2)
-     (match (interp-env e1 r ds)
-       ['err 'err]
-       [v1 (match (interp-env e2 r ds)
-             ['err 'err]
-             [v2 (interp-prim2 p v1 v2)])])]
+     (interp-prim2 p
+                   (interp-e e1 r ds)
+                   (interp-e e2 r ds))]
     [(Prim3 p e1 e2 e3)
-     (match (interp-env e1 r ds)
-       ['err 'err]
-       [v1 (match (interp-env e2 r ds)
-             ['err 'err]
-             [v2 (match (interp-env e3 r ds)
-                   ['err 'err]
-                   [v3 (interp-prim3 p v1 v2 v3)])])])]
-    [(If e0 e1 e2)
-     (match (interp-env e0 r ds)
-       ['err 'err]
-       [v
-        (if v
-            (interp-env e1 r ds)
-            (interp-env e2 r ds))])]
+     (interp-prim3 p
+                   (interp-e e1 r ds)
+                   (interp-e e2 r ds)
+                   (interp-e e3 r ds))]
+    [(If e1 e2 e3)
+     (if (interp-e e1 r ds)
+         (interp-e e2 r ds)
+         (interp-e e3 r ds))]
     [(Begin e1 e2)
-     (match (interp-env e1 r ds)
-       ['err 'err]
-       [v    (interp-env e2 r ds)])]
+     (begin (interp-e e1 r ds)
+            (interp-e e2 r ds))]
     [(Let x e1 e2)
-     (match (interp-env e1 r ds)
-       ['err 'err]
-       [v (interp-env e2 (ext r x v) ds)])]
+     (let ((v (interp-e e1 r ds)))
+       (interp-e e2 (ext r x v) ds))]
     [(App f es)
-     (match (interp-env* es r ds)
-       ['err 'err]
-       [vs
+     (let ((vs (interp-e* es r ds)))
         (match (defns-lookup ds f)
           [(Defn _ fun)
-           (apply-fun fun vs ds)])])]
+           (apply-fun fun vs ds)]))]
     [(Apply f es e)
-     (match (interp-env* es r ds)
-       ['err 'err]
-       [vs
-        (match (interp-env e r ds)
-          ['err 'err]
-          [ws
-           (if (list? ws)
-               (match (defns-lookup ds f)
-                 [(Defn _ fun)
-                  (apply-fun fun (append vs ws) ds)])
-               'err)])])]))
+     (let ((vs (interp-e* es r ds))
+           (ws (interp-e e r ds)))
+       (if (list? ws)
+           (match (defns-lookup ds f)
+             [(Defn _ fun)
+              (apply-fun fun (append vs ws) ds)])
+           (raise 'err)))]))
 
 ;; (Listof Expr) REnv Defns -> (Listof Value) | 'err
-(define (interp-env* es r ds)
+(define (interp-e* es r ds)
   (match es
     ['() '()]
     [(cons e es)
-     (match (interp-env e r ds)
+     (match (interp-e e r ds)
        ['err 'err]
-       [v (match (interp-env* es r ds)
+       [v (match (interp-e* es r ds)
             ['err 'err]
             [vs (cons v vs)])])]))
 
@@ -102,17 +88,17 @@
     [(FunPlain xs e)
      ; check arity matches-arity-exactly?
      (if (= (length xs) (length vs))
-         (interp-env e (zip xs vs) ds)
+         (interp-e e (zip xs vs) ds)
          'err)]
     [(FunRest xs x e)
      ; check arity is acceptable
      (if (< (length vs) (length xs))
          'err
-           (interp-env e
-                       (zip (cons x xs)
-                            (cons (drop vs (length xs))
-                                  (take vs (length xs))))
-                       ds))]
+           (interp-e e
+                     (zip (cons x xs)
+                          (cons (drop vs (length xs))
+                                (take vs (length xs))))
+                     ds))]
     [(FunCase cs)
      (match (select-case-lambda cs (length vs))
        ['err 'err]
