@@ -43,7 +43,7 @@
      (seq)]
     [(Let (list x) (list e1) e)
      ;; TODO: this works for special case of single binding
-     ;; TODO: revise to work for any number of bindings     
+     ;; TODO: revise to work for any number of bindings
      (compile-let1 x e1 e c)]
     [(Let* (list x) (list e1) e)
      ;; TODO: this works for special case of single binding
@@ -56,10 +56,11 @@
 (define (compile-datum d)
   (seq (Mov rax (value->bits d))))
 
+
 ;; Id CEnv -> Asm
 (define (compile-variable x c)
   (let ((i (lookup x c)))
-    (seq (Mov rax (Mem i rsp)))))
+    (seq (Mov rax (Mem rsp i)))))
 
 ;; Op0 -> Asm
 (define (compile-prim0 p)
