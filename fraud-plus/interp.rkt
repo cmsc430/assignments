@@ -41,6 +41,12 @@
     [(Begin e1 e2)
      (begin (interp-e e1 r)
             (interp-e e2 r))]
+    [(Cond eqs eas el)
+     ;; TODO
+     0]
+    [(Case e ds es el)
+     ;; TODO
+     0]
     [(Let (list x) (list e1) e2)
      ;; TODO: this works for special case of single binding
      ;; TODO: revise to work for any number of bindings
