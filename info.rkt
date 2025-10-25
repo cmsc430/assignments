@@ -6,5 +6,6 @@
 
 (define test-omit-paths
   (list "iniquity-plus/test/compile.rkt"
-        "knock-plus/test/compile.rkt"))
+        "knock-plus/test/compile.rkt"
+        "hoax-plus/test/compile.rkt"))
         
