@@ -38,5 +38,10 @@
   (check-equal? (parse '(let ((let 1)) let))
                 (p (Let '(let) (list (Lit 1)) (Var 'let))))
   (check-equal? (parse '(let ((if 1)) if))
-                (p (Let '(if) (list (Lit 1)) (Var 'if)))))
+                (p (Let '(if) (list (Lit 1)) (Var 'if))))
+  (check-exn exn:fail? (λ () (parse-closed '(let ((x 1) (x 2)) x))))
+  (check-equal? (parse-closed '(let ((x 1)) (let ((x 2)) x)))
+                (p (Let '(x) (list (Lit 1)) (Let '(x) (list (Lit 2)) (Var 'x)))))
+  (check-equal? (parse-closed '(let* ((x 1) (x 2)) x))
+                (p (Let* '(x x) (list (Lit 1) (Lit 2)) (Var 'x)))))
 

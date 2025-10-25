@@ -68,9 +68,11 @@
          [(list fvs e)
           (list fvs (Let (reverse xs) (reverse es) e))])]
       [(list (cons (list (? symbol? x) s1) sr) sb)
-       (match (parse/acc s1 bvs fvs)
-         [(list fvs e1)
-          (rec (list sr sb) (cons x xs) (cons e1 es) fvs)])]
+       (if (member x xs)
+           (error "let: duplicate variable" x)
+           (match (parse/acc s1 bvs fvs)
+             [(list fvs e1)
+              (rec (list sr sb) (cons x xs) (cons e1 es) fvs)]))]
       [_ (error "let: bad syntax" s)]))
   (rec s '() '() fvs))
 
