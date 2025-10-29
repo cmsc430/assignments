@@ -9,10 +9,6 @@
 ;; ClosedExpr -> Asm
 (define (compile e)
   (prog (Global 'entry)
-        (Extern 'peek_byte)
-        (Extern 'read_byte)
-        (Extern 'write_byte)
-        (Extern 'raise_error)
         (Label 'entry)
         ;; save callee-saved register
         (Push r15)
@@ -23,6 +19,7 @@
         ;; Error handler
         (Label 'err)
         pad-stack
+        (Extern 'raise_error)
         (Call 'raise_error)))
 
 ;; type CEnv = (Listof [Maybe Id])
@@ -35,8 +32,7 @@
     [(Prim0 p) (compile-prim0 p)]
     [(Prim1 p e) (compile-prim1 p e c)]
     [(Prim2 p e1 e2) (compile-prim2 p e1 e2 c)]
-    [(If e1 e2 e3)
-     (compile-if e1 e2 e3 c)]
+    [(If e1 e2 e3) (compile-if e1 e2 e3 c)]
     [(Cond eqs eas el) ;; TODO
      (seq)]
     [(Case e ds es el) ;; TODO
@@ -49,8 +45,7 @@
      ;; TODO: this works for special case of single binding
      ;; TODO: revise to work for any number of bindings
      (compile-let1 x e1 e c)]
-    [(Begin e1 e2)
-     (compile-begin e1 e2 c)]))
+    [(Begin e1 e2) (compile-begin e1 e2 c)]))
 
 ;; Datum -> Asm
 (define (compile-datum d)
