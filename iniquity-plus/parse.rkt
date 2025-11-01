@@ -150,10 +150,6 @@
                   [(list ys gs e2)
                    (list ys gs (Let x e1 e2))])])]
             [_ (error "let: bad syntax" s)])]
-         ['apply
-          (match sr
-            [(list-rest (? symbol? f) sr)
-             (parse-apply/acc sr f fs xs ys (if (memq f fs) gs (cons f gs)))])]
          [_
           (match (parse-es/acc sr fs xs ys gs)
             [(list ys gs es)
@@ -179,20 +175,6 @@
       [_
        (error "parse error" s)]))
   (rec s xs ys gs))
-
-;; S-Expr Id [Listof Id] [Listof Id] [Listof Id] [Listof Id] -> (list [Listof Id] [Listof Id] Apply)
-(define (parse-apply/acc s f fs xs ys gs)
-  (match s
-    [(list s)
-     (match (parse-e/acc s fs xs ys gs)
-       [(list ys gs e)
-        (list ys gs (Apply f '() e))])]
-    [(cons s sr)
-     (match (parse-e/acc s fs xs ys gs)
-       [(list ys gs e)
-        (match (parse-apply/acc sr f fs xs ys gs)
-          [(list ys gs (Apply f es e0))
-           (list ys gs (Apply f (cons e es) e0))])])]))
 
 ;; S-Expr [Listof Id] [Listof Id] [Listof Id] [Listof Id] -> (list [Listof Id] [Listof Id] [Listof Expr])
 ;;   s: list of expressions shaped s-expr to be parsed
