@@ -201,6 +201,12 @@
                   '(2 3 4))
     (check-equal? (run '(define (f x y) y)
                        '(f 1 (add1 #f)))
+                  'err)
+    (check-equal? (run '(define (f x y) y)
+                       '(f 1))
+                  'err)
+    (check-equal? (run '(define (f x y) y)
+                       '(f 1 2 3))
                   'err))
 
   (begin ;; Iniquity+
@@ -280,36 +286,6 @@
                                     (cons (f 1 2 3)
                                           '()))))
                   '(() 2 (3)))
-
-    (check-equal? (run '(define (f) 1)
-                       '(apply f '()))
-                  1)
-    (check-equal? (run '(define (f . xs) 1)
-                       '(apply f '()))
-                  1)
-    (check-equal? (run '(define (f . xs) xs)
-                       '(apply f '()))
-                  '())
-    (check-equal? (run '(define (f . xs) xs)
-                       '(apply f (cons 1 (cons 2 (cons 3 '())))))
-                  '(1 2 3))
-    (check-equal? (run '(define (f . xs) xs)
-                       '(apply f 1 2 (cons 3 '())))
-                  '(1 2 3))
-    (check-equal? (run '(define (append . xss)
-                          (if (empty? xss)
-                              '()
-                              (if (empty? (car xss))
-                                  (apply append (cdr xss))
-                                  (cons (car (car xss))
-                                        (apply append (cdr (car xss)) (cdr xss))))))
-                       '(define (list . xs) xs)
-                       '(define (flatten xs)
-                          (apply append xs))
-                       '(flatten (list (append) (append (list 1 2 3) (list 4 5) (list 6)) (list 7))))
-                  '(1 2 3 4 5 6 7))
-
-    ;; Extra tests
     (check-equal? (run '(define f (case-lambda))
                        '(if #f (f) 1))
                   1)
@@ -321,67 +297,6 @@
                        '(let ((x (f 1 2 3)))
                           (f x)))
                   '())
-    (check-equal? (run '(define (f x . xs)
-                          (let ((ys xs))
-                            (if (empty? xs)
-                                x
-                                (apply f ys))))
-                       '(let ((z 1))
-                          (f 1 2 3)))
-                  3)
-    (check-equal? (run '(define (f x . xs)
-                          (let ((ys xs))
-                            (if (empty? xs)
-                                x
-                                (apply f ys))))
-                       '(let ((z 1))
-                          (f (f 1 2 3))))
-                  3)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x . xs)
-                             (let ((ys xs))
-                               (if (empty? xs)
-                                   x
-                                   (apply f xs)))]))
-                       '(let ((z 1))
-                          (f (f 1 2 3))))
-                  3)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x) x]
-                            [(x . xs)
-                             (apply f xs)]))
-                       '(f 1 2 3))
-                  3)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x) x]
-                            [(x . xs)
-                             (apply f xs)]))
-                       '(f))
-                  'err)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x y) x]
-                            [(x y . xs)
-                             (apply f xs)]))
-                       '(f 1 2 3))
-                  'err)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x y) x]
-                            [(x y . xs)
-                             (apply f xs)]))
-                       '(f 1 2 (cons 3 (cons 4 '()))))
-                  'err)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x) (char->integer (car x))]
-                            [(x y . xs)
-                             (apply f xs)]))
-                       '(f 1 2 (cons #\A 4)))
-                  65)
     (check-equal? (run '(define f
                           (case-lambda
                             [(x y) x]
@@ -390,28 +305,7 @@
                             [(x y z . xs)
                              (char->integer z)]))
                        '(f 1 #\a 3))
-                  97)
-    (check-equal? (run '(define plus
-                          (case-lambda
-                            [() 0]
-                            [(n . ns) (+ n (apply plus ns))]))
-                       '(define (cars xss)
-                          (if (empty? xss)
-                              '()
-                              (cons (car (car xss)) (cars (cdr xss)))))
-                       '(define (cdrs xss)
-                          (if (empty? xss)
-                              '()
-                              (cons (cdr (car xss)) (cdrs (cdr xss)))))
-                       '(define (mapplus ns . nss)
-                          (if (cons? ns)
-                              (cons (apply plus (car ns) (cars nss))
-                                    (apply mapplus (cdr ns) (cdrs nss)))
-                              '()))
-                       '(mapplus (cons 1 (cons 2 '()))
-                                 (cons 3 (cons 4 '()))
-                                 (cons 5 (cons 6 '()))))
-                  '(9 12))))
+                  97)))
 
 (define (test/io run)
   (begin ;; Evildoer

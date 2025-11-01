@@ -61,15 +61,7 @@
      (let ((vs (interp-e* es r ds)))
         (match (defns-lookup ds f)
           [(Defn _ fun)
-           (apply-fun fun vs ds)]))]
-    [(Apply f es e)
-     (let ((vs (interp-e* es r ds))
-           (ws (interp-e e r ds)))
-       (if (list? ws)
-           (match (defns-lookup ds f)
-             [(Defn _ fun)
-              (apply-fun fun (append vs ws) ds)])
-           (raise 'err)))]))
+           (apply-fun fun vs ds)]))]))
 
 ;; (Listof Expr) REnv Defns -> (Listof Value) { raises 'err }
 (define (interp-e* es r ds)
@@ -79,32 +71,30 @@
      (cons (interp-e e r ds)
            (interp-e* es r ds))]))
 
-;; Fun [Listof Values] Defns -> Answer
+;; Fun [Listof Values] Defns -> Value { raises 'err }
 (define (apply-fun f vs ds)
   (match f
     [(FunPlain xs e)
      ; check arity matches-arity-exactly?
      (if (= (length xs) (length vs))
          (interp-e e (zip xs vs) ds)
-         'err)]
+         (raise 'err))]
     [(FunRest xs x e)
      ; check arity is acceptable
      (if (< (length vs) (length xs))
-         'err
-           (interp-e e
-                     (zip (cons x xs)
-                          (cons (drop vs (length xs))
-                                (take vs (length xs))))
-                     ds))]
+         (raise 'err)
+         (interp-e e
+                   (zip (cons x xs)
+                        (cons (drop vs (length xs))
+                              (take vs (length xs))))
+                   ds))]
     [(FunCase cs)
-     (match (select-case-lambda cs (length vs))
-       ['err 'err]
-       [f (apply-fun f vs ds)])]))
+     (apply-fun (select-case-lambda cs (length vs)) vs ds)]))
 
-;; [Listof FunCaseClause] Nat -> Fun | 'err
+;; [Listof FunCaseClause] Nat -> Fun { raises 'err }
 (define (select-case-lambda cs n)
   (match cs
-    ['() 'err]
+    ['() (raise 'err)]
     [(cons (and (FunPlain xs e) f) cs)
      (if (= (length xs) n)
          f

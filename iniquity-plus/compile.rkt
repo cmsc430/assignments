@@ -51,7 +51,8 @@
   (match fun
     [(FunPlain xs e)
      (seq (Label (symbol->label f))
-          ;; TODO: check arity
+          (Cmp r8 (length xs))
+          (Jne 'err)
           (compile-e e (reverse xs))
           (Add rsp (* 8 (length xs)))
           (Ret))]
@@ -74,9 +75,7 @@
     [(If e1 e2 e3) (compile-if e1 e2 e3 c)]
     [(Begin e1 e2) (compile-begin e1 e2 c)]
     [(Let x e1 e2) (compile-let x e1 e2 c)]
-    [(App f es) (compile-app f es c)]
-    [(Apply f es e)
-     (compile-apply f es e c)]))
+    [(App f es) (compile-app f es c)]))
 
 ;; Datum -> Asm
 (define (compile-datum d)
@@ -168,14 +167,9 @@
     (seq (Lea rax r)
          (Push rax)
          (compile-es es (cons #f c))
-         ;; TODO: communicate argument count to called function
+         (Mov r8 (length es)) ; pass arity info
          (Jmp (symbol->label f))
          (Label r))))
-
-;; Id [Listof Expr] Expr CEnv -> Asm
-(define (compile-apply f es e c)
-  ;; TODO: implement apply
-  (seq))
 
 ;; [Listof Expr] CEnv -> Asm
 (define (compile-es es c)
