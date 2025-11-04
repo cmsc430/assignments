@@ -1,8 +1,7 @@
 #lang racket
 (provide Lit Prim0 Prim1 Prim2 Prim3 If
          Eof Begin
-         Let Var Prog Defn App
-         Apply FunPlain FunRest FunCase)
+         Let Var Prog Defn App FunPlain FunRest FunCase)
 
 ;; type Prog = (Prog (Listof Defn) Expr)
 (struct Prog (ds e) #:prefab)
@@ -29,7 +28,6 @@
 ;;           | (Let Id Expr Expr)
 ;;           | (Var Id)
 ;;           | (App Id (Listof Expr))
-;;           | (Apply Id (Listof Expr) Expr)
 
 ;; type ClosedExpr = { e ∈ Expr | e contains no free variables }
 
@@ -66,5 +64,4 @@
 (struct Let (x e1 e2) #:prefab)
 (struct Var (x) #:prefab)
 (struct App (f es) #:prefab)
-(struct Apply (f es e) #:prefab)
 

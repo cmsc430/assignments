@@ -35,7 +35,7 @@
   (define (rec ss fs)
     (match ss
       [(list s) fs]
-      [(cons (cons 'define sd) sr)
+      [(cons (cons (? (not-in fs) 'define) sd) sr)
        (match (parse-defn-name sd)
          [f (if (memq f fs)
                 (error "duplicate definition" f)
@@ -79,7 +79,7 @@
 (provide (all-defined-out))
 (define (parse-define/acc s fs xs ys gs)
   (match s
-    [(list 'define (? symbol? f) (cons 'case-lambda sr))
+    [(list 'define (? symbol? f) (cons (? (not-in (append fs xs)) 'case-lambda) sr))
      (match (parse-case-lambda/acc sr fs xs ys gs)
        [(list ys gs fun)
         (list ys gs (Defn f fun))])]
@@ -113,9 +113,13 @@
     [(list (cons (? symbol? x) r) s)
      (match (parse-define-plain-or-rest-fun/acc (list r s) fs (cons x xs) ys gs)
        [(list ys gs (FunPlain xs e))
-        (list ys gs (FunPlain (cons x xs) e))]
+        (if (memq x xs)
+            (error "duplicate identifier" x)
+            (list ys gs (FunPlain (cons x xs) e)))]
        [(list ys gs (FunRest xs r e))
-        (list ys gs (FunRest (cons x xs) r e))])]
+        (if (or (memq x xs) (eq? x r))
+            (error "duplicate identifier" x)
+            (list ys gs (FunRest (cons x xs) r e)))])]
     [_ (error "parse error")]))
 
 ;; S-Expr [Listof Id] [Listof Id] [Listof Id] [Listof Id] -> (list [Listof Id] [Listof Id] Expr)

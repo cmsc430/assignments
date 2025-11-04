@@ -43,5 +43,12 @@
   (check-equal? (parse-closed '(let ((x 1)) (let ((x 2)) x)))
                 (p (Let '(x) (list (Lit 1)) (Let '(x) (list (Lit 2)) (Var 'x)))))
   (check-equal? (parse-closed '(let* ((x 1) (x 2)) x))
-                (p (Let* '(x x) (list (Lit 1) (Lit 2)) (Var 'x)))))
+                (p (Let* '(x x) (list (Lit 1) (Lit 2)) (Var 'x))))
+  (check-equal? (parse '(let ((let 1) (x 2)) let))
+                (p (Let '(let x) (list (Lit 1) (Lit 2)) (Var 'let))))
+  (check-equal? (parse '(let* ((let* 1) (x 2)) let*))
+                (p (Let* '(let* x) (list (Lit 1) (Lit 2)) (Var 'let*))))
+  (check-equal? (parse '(let* ((let* 1) (let* 2)) let*))
+                (p (Let* '(let* let*) (list (Lit 1) (Lit 2)) (Var 'let*))))
+  (check-exn exn:fail? (λ () (parse '(let ((let 1)) (let ((x 1)) x))))))
 
