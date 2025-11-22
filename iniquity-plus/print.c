@@ -31,7 +31,7 @@ void print_result(val_t x)
   case T_EMPTY:
   case T_BOX:
   case T_CONS:
-  case T_VECT:    
+  case T_VECT:
     printf("'");
     print_result_interior(x);
     break;
@@ -39,7 +39,7 @@ void print_result(val_t x)
     putchar('"');
     print_str(val_unwrap_str(x));
     putchar('"');
-    break;    
+    break;
   case T_INVALID:
     printf("internal error");
   }
@@ -62,7 +62,7 @@ void print_result_interior(val_t x)
     break;
   case T_VECT:
     print_vect(val_unwrap_vect(x));
-    break;    
+    break;
   default:
     print_result(x);
   }
@@ -71,14 +71,15 @@ void print_result_interior(val_t x)
 void print_vect(val_vect_t *v)
 {
   uint64_t i;
+  int64_t len = val_unwrap_int(v->len);
 
   if (!v) { printf("#()"); return; }
 
   printf("#(");
-  for (i = 0; i < v->len; ++i) {
+  for (i = 0; i < len; ++i) {
     print_result_interior(v->elems[i]);
 
-    if (i < v->len - 1)
+    if (i < len - 1)
       putchar(' ');
   }
   printf(")");
@@ -105,9 +106,12 @@ void print_cons(val_cons_t *cons)
 
 void print_str(val_str_t* s)
 {
-  if (!s) return;
   uint64_t i;
-  for (i = 0; i < s->len; ++i)
+  int64_t len = val_unwrap_int(s->len);
+
+  if (!s) return;
+
+  for (i = 0; i < len; ++i)
     print_str_char(s->codepoints[i]);
 }
 
