@@ -222,8 +222,8 @@
           (Mov r9 (Mem r8 (- type-vect)))
           (Cmp r10 r9)
           (Jge 'err)
-          (Sar r10 1) ; convert to byte offset          
-          (Mov (Mem r8 r10 (- 8 type-vect)) rax)          
+          (Sar r10 1) ; convert to byte offset
+          (Mov (Mem r8 r10 (- 8 type-vect)) rax)
           (Mov rax (value->bits (void))))]))
 
 ;; OpN Natural -> Asm
@@ -234,9 +234,9 @@
           (compile-op-list n))]
     ['vector
      (match n
-       [0 (seq (Mov rax type-vect))]
+       [0 (seq (Lea rax (Mem 'empty type-vect)))]
        [n (seq (compile-op-vect n)
-               (Mov r9 n)
+               (Mov r9 (value->bits n))
                (Mov (Mem rbx) r9)
                (Mov rax rbx)
                (Xor rax type-vect)
@@ -246,8 +246,8 @@
   (match n
     [0 (seq)]
     [n (seq (Pop r9)
-            (Mov (Mem rbx) 'rax)
-            (Mov (Mem rbx 8) 'r9)
+            (Mov (Mem rbx 8) rax)
+            (Mov (Mem rbx 0) r9)
             (Mov rax rbx)
             (Xor rax type-cons)
             (Add rbx 16)
@@ -291,4 +291,3 @@
 ;; Undo the stack alignment after a call
 (define unpad-stack
   (seq (Add rsp r15)))
-
