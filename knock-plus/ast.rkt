@@ -51,6 +51,9 @@
 ;;           | (Box Pat)
 ;;           | (Cons Pat Pat)
 ;;           | (Conj Pat Pat)
+;;           | (List [Listof Pat])
+;;           | (Vect [Listof Pat])
+;;           | (Pred Id)
 
 (struct Eof () #:prefab)
 (struct Lit (d) #:prefab)
