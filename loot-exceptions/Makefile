@@ -1,12 +1,9 @@
-UNAME := $(shell uname)
-.PHONY: test submit.zip
-
 ifeq ($(shell uname), Darwin)
-  LANGS_CC ?= arch -x86_64 gcc
-  LANGS_AS ?= nasm -g -f macho64 --gprefix _
+  LANGS_CC ?= arch -x86_64 clang
+  LANGS_AS ?= arch -x86_64 clang -c
 else
-  LANGS_CC ?= gcc
-  LANGS_AS ?= nasm -g -f elf64
+  LANGS_CC ?= clang
+  LANGS_AS ?= clang -c
 endif
 
 objs = \
@@ -15,9 +12,9 @@ objs = \
 	values.o \
 	io.o
 
-default: submit.zip
+.DEFAULT_GOAL: submit.zip
 
-submit.zip:
+submit.zip: $(shell find . -name "*.rkt" -o -name "*.c")
 	zip submit.zip -r * \
 		-x \*.[os] -x \*~ -x \*zip \
 		-x \*Zone.Identifier -x \*\*compiled\*\*
