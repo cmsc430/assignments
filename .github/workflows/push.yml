@@ -1,22 +1,21 @@
-on:
-  - push
-  - workflow_dispatch
+on: [push, workflow_dispatch]
 
 jobs:
   build-and-test:
-    runs-on: ${{ matrix.os }}
     # only version here so that only one zip is created
     strategy:
       matrix:
         os: [ubuntu-22.04]
         racket-variant: ['CS']
-        racket-version: ['8.14']
-    name: Test on Racket ${{ matrix.racket-variant }} ${{ matrix.racket-version }} on ${{ matrix.os }}	
+        racket-version: ['9.0']
+    runs-on: ${{ matrix.os }}
+    name: Test on Racket ${{ matrix.racket-variant }} ${{ matrix.racket-version }} on ${{ matrix.os }}
+
     steps:
+
     - name: Checkout
       uses: actions/checkout@main
-    - name: Install nasm
-      run: sudo apt-get install nasm
+
     - name: Install Racket
       uses: Bogdanp/setup-racket@v1.11
       with:
@@ -24,21 +23,30 @@ jobs:
         distribution: 'full'
         variant: ${{ matrix.racket-variant }}
         version: ${{ matrix.racket-version }}
+
+    - name: Install clang
+      run: |
+        sudo apt install -y clang libssl-dev
+
     - name: Version info
       run: |
-        nasm --version
+        clang --version
         gcc --version
+
     - name: Install assignments package
       run: |
         raco pkg install --auto ../assignments/
+
     - name: Run tests
       run: |
         raco test -p assignments
         raco test knock-plus/test/compile.rkt 2>&1 | grep 'failures' # should not pass
+        #
     - name: Create zips
       run: |
         mkdir zips/
         zip zips/knock-plus.zip `git ls-files knock-plus`
+
     - name: Archive zips
       uses: actions/upload-artifact@v4
       with:
