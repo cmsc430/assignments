@@ -81,14 +81,21 @@
     [(WithHandler e1 e2 e)
      (let ((p (interp-e e1 r ds))
            (f (interp-e e2 r ds)))
-       (with-handlers ([err? raise]
-                       [(λ (v) #t)
+       (with-handlers ([(λ (v) #t)
                         (λ (v)
-                          (if (procedure? p)
-                              (if (and (p v) (procedure? f))
-                                  (f v)
-                                  (raise 'err))
-                              (raise 'err)))])
+                          (cond
+                            ; Errors are automatically re-raised.
+                            [(eq? v 'err)
+                             (raise 'err)]
+                            ; The predicate and handler exprs must be functions.
+                            [(or (not (procedure? p))
+                                 (not (procedure? f)))
+                             (raise 'err)]
+                            ; If the predicate succeeds, apply the handler.
+                            [(p v)
+                             (f v)]
+                            ; Otherwise, re-raise.
+                            [else (raise v)]))])
          (interp-e e r ds)))]))
 
 ;; (Listof Expr) REnv Defns -> (Listof Value) { raises 'err }
@@ -149,4 +156,3 @@
     [((cons x xs) (cons y ys))
      (cons (list x y)
            (zip xs ys))]))
-
