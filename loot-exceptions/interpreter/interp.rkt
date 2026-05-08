@@ -84,17 +84,13 @@
        (with-handlers ([(λ (v) #t)
                         (λ (v)
                           (cond
-                            ; Errors are automatically re-raised.
                             [(eq? v 'err)
                              (raise 'err)]
-                            ; The predicate and handler exprs must be functions.
                             [(or (not (procedure? p))
                                  (not (procedure? f)))
                              (raise 'err)]
-                            ; If the predicate succeeds, apply the handler.
                             [(p v)
                              (f v)]
-                            ; Otherwise, re-raise.
                             [else (raise v)]))])
          (interp-e e r ds)))]))
 
@@ -156,3 +152,4 @@
     [((cons x xs) (cons y ys))
      (cons (list x y)
            (zip xs ys))]))
+
