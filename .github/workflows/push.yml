@@ -15,10 +15,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@main
-    - name: Install nasm
-      run: sudo apt-get install nasm
     - name: Install Racket
-      uses: Bogdanp/setup-racket@v1.11
+      uses: Bogdanp/setup-racket@v1.15
       with:
         architecture: 'x64'
         distribution: 'full'
@@ -26,8 +24,11 @@ jobs:
         version: ${{ matrix.racket-version }}
     - name: Version info
       run: |
-        nasm --version
         gcc --version
+    - name: Install a86 package
+      run: |
+        git clone --branch "${{ github.ref_name }}" --single-branch https://github.com/cmsc430/a86.git
+        raco pkg install --auto a86/
     - name: Install assignments package
       run: |
         raco pkg install --auto ../assignments/
