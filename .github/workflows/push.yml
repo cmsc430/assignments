@@ -27,8 +27,8 @@ jobs:
         gcc --version
     - name: Install a86 package
       run: |
-        git clone --branch "${{ github.ref_name }}" --single-branch https://github.com/cmsc430/a86.git
-        raco pkg install --auto --no-docs a86/
+        git clone --branch "${{ github.ref_name }}" --single-branch https://github.com/cmsc430/a86.git ../a86
+        raco pkg install --auto --no-docs ../a86/
     - name: Install assignments package
       run: |
         raco pkg install --auto --no-docs ../assignments/
