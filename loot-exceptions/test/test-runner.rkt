@@ -300,7 +300,11 @@
                        '(with-handlers ([(λ (x) #t) (λ (x) 1)]) (f 0))) 1)
     (check-equal? (run '(add1 (with-handlers ([(λ (x) #t) (λ (x) 1)]) (raise 0)))) 2)
     (check-equal? (run '(add1 (with-handlers ([(λ (x) #t) (λ (x) 1)]) 0))) 1)
-    (check-equal? (run '(add1 (with-handlers ([(λ (x) #t) (λ (x) 1)]) (+ #f (raise 0))))) 2)))
+    (check-equal? (run '(add1 (with-handlers ([(λ (x) #t) (λ (x) 1)]) (+ #f (raise 0))))) 2)
+    (check-equal? (run '(with-handlers ([(λ (x) #t) (λ (x) 1)])
+                          (with-handlers ([(λ (x) #f) (λ (x) 2)])
+                            (raise 0))))
+                  1)))
 
 (define (test/io run)
   (begin ;; Evildoer

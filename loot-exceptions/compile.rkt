@@ -32,7 +32,6 @@
            (Pop rbx)
            (Ret)
            (compile-defines ds)
-           (compile-lambda-defines (lambdas p))
            (Label 'err)
            pad-stack
            (Extern 'raise_error)
@@ -121,7 +120,7 @@
 ;; Expr CEnv -> Asm
 (define (compile-raise e c)
   ;; TODO
-  (seq))         
+  (seq))
 
 ;; Expr Expr Expr CEnv -> Asm
 (define (compile-with-handler e1 e2 e c)
@@ -296,7 +295,18 @@
 ;; Id [Listof Id] Expr CEnv -> Asm
 (define (compile-lam f xs e c)
   (let ((fvs (fv (Lam f xs e))))
-    (seq (Lea rax (symbol->label f))
+    (seq (Text 'lambdas)
+         (let ((env (append (reverse fvs) (reverse xs) (list #f))))
+           (seq (Label (symbol->label f))
+                (Cmp r8 (length xs))
+                (Jne 'err)
+                (Mov rax (Mem rsp (* 8 (length xs))))
+                (copy-env-to-stack fvs 8)
+                (compile-e e env #t)
+                (Add rsp (* 8 (length env))) ; pop env
+                (Ret)))
+         (Text)
+         (Lea rax (symbol->label f))
          (Mov (Mem rbx) rax)
          (free-vars-to-heap fvs c 8)
          (Mov rax rbx) ; return value

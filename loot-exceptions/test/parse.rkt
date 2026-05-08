@@ -1,6 +1,6 @@
 #lang racket
-(require "../parse.rkt")
-(require "../ast.rkt")
+(require "../syntax/parse.rkt")
+(require "../syntax/ast.rkt")
 (require rackunit)
 
 (define (p e)
@@ -75,7 +75,7 @@
   (check-equal? (parse '(match x ['() 1]))
                 (p (Match (Var 'x) (list (Lit '())) (list (Lit 1)))))
   (check-exn exn:fail? (λ () (parse-closed '(match 1 [x y])))))
-  
+
 (begin ; Loot
   (check-equal? (parse '(f x))
                 (p (App (Var 'f) (list (Var 'x))))))
