@@ -7,7 +7,10 @@
         "git://github.com/cmsc430/a86"))
 
 (define test-omit-paths
-  (list "dupe-plus/test/run-compile-tests.rkt"
+  (list "dupe-plus/test/run-interp-tests.rkt"
+        "dupe-plus/test/run-compile-tests.rkt"
+        "dupe-plus-plus/test/run-interp-tests.rkt"
+        "dupe-plus-plus/test/run-compile-tests.rkt"
         "iniquity-plus/test/run-compile-tests.rkt"
         "knock-plus/test/run-compile-tests.rkt"
         "hoax-plus/test/run-compile-tests.rkt"
