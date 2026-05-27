@@ -45,7 +45,7 @@ jobs:
     - name: Run tests
       run: |
         raco test -p assignments
-        raco test knock-plus/test/compile.rkt 2>&1 | grep 'failures' # should not pass
+        raco test knock-plus/test/run-compile-tests.rkt 2>&1 | grep 'failures' # should not pass
         #
     - name: Create zips
       run: |
