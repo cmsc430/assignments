@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@main
 
     - name: Install Racket
-      uses: Bogdanp/setup-racket@v1.11
+      uses: Bogdanp/setup-racket@v1.15
       with:
         architecture: 'x64'
         distribution: 'full'
@@ -33,14 +33,19 @@ jobs:
         clang --version
         gcc --version
 
+    - name: Install a86 package
+      run: |
+        git clone --branch "${{ github.ref_name }}" --single-branch https://github.com/cmsc430/a86.git ../a86
+        raco pkg install --auto --no-docs ../a86/
+
     - name: Install assignments package
       run: |
-        raco pkg install --auto ../assignments/
+        raco pkg install --auto --no-docs ../assignments/
 
     - name: Run tests
       run: |
         raco test -p assignments
-        raco test knock-plus/test/compile.rkt 2>&1 | grep 'failures' # should not pass
+        raco test knock-plus/test/run-compile-tests.rkt 2>&1 | grep 'failures' # should not pass
         #
     - name: Create zips
       run: |
