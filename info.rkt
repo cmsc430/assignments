@@ -7,7 +7,9 @@
         "git://github.com/cmsc430/a86"))
 
 (define test-omit-paths
-  (list "iniquity-plus/test/compile.rkt"
+  (list "a86-basics/"
+        "racket-basics/"
+        "iniquity-plus/test/compile.rkt"
         "knock-plus/test/compile.rkt"
         "hoax-plus/test/compile.rkt"
         "loot-exceptions/test/compile.rkt"
