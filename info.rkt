@@ -9,6 +9,8 @@
 (define test-omit-paths
   (list "a86-basics/"
         "racket-basics/"
+        "blackmail-plus/test/run-interp-tests.rkt"
+        "blackmail-plus/test/run-compile-tests.rkt"
         "dupe-plus/test/run-interp-tests.rkt"
         "dupe-plus/test/run-compile-tests.rkt"
         "dupe-plus-plus/test/run-interp-tests.rkt"
