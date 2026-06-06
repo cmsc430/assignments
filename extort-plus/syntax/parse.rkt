@@ -38,6 +38,7 @@
 ;; S-Expr -> Cond
 (define (parse-cond s)
   (match s
+    ['() (Cond '() '() (Prim0 'void))]
     [(list (list 'else s)) (Cond '() '() (parse s))]
     [(cons (list s1 s2) sr)
      (match (parse-cond sr)
@@ -56,6 +57,7 @@
 ;; S-Expr S-Expr -> Case
 (define (parse-case-clauses s sr)
   (match sr
+    ['() (Case (parse s) '() '() (Prim0 'void))]
     [(list (list 'else s2)) (Case (parse s) '() '() (parse s2))]
     [(cons (list d1 s1) sr)
      (match (parse-case-clauses s sr)

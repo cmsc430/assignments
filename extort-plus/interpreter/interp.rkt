@@ -34,5 +34,11 @@
          (interp-e e3))]
     [(Begin e1 e2)
      (begin (interp-e e1)
-            (interp-e e2))]))
+            (interp-e e2))]
+    [(Cond eqs eas el)
+     ;; TODO
+     0]
+    [(Case e ds es el)
+     ;; TODO
+     0]))
 
