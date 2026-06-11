@@ -6,11 +6,13 @@ else
   LANGS_AS ?= clang -c
 endif
 
-objs = \
-	main.o \
-	print.o \
-	values.o \
-	io.o
+RACKET ?= racket
+
+RUNTIME_DIR := runtime
+RUNTIME := $(RUNTIME_DIR)/runtime.o
+
+# Example source extension for this language.
+SRC_EXT := rkt
 
 .DEFAULT_GOAL: submit.zip
 
@@ -19,24 +21,22 @@ submit.zip: $(shell find . -name "*.rkt" -o -name "*.c")
 		-x \*.[os] -x \*~ -x \*zip \
 		-x \*Zone.Identifier -x \*\*compiled\*\*
 
-runtime.o: $(objs)
-	ld -r $(objs) -o runtime.o
+# Build the runtime bundles if needed.
+$(RUNTIME):
+	$(MAKE) -C $(RUNTIME_DIR)
 
-%.run: %.o runtime.o
-	$(LANGS_CC) runtime.o $< -o $@
+# Compile source program to assembly.
+%.s: %.$(SRC_EXT)
+	cat $< | $(RACKET) -t compiler/compile-stdin.rkt -m > $@
 
-.c.o:
-	$(LANGS_CC) -fPIC -c -g -o $@ $<
-
-.s.o:
+# Assemble to object.
+%.o: %.s
 	$(LANGS_AS) -o $@ $<
 
-%.s: %.rkt
-	cat $< | racket -t compile-stdin.rkt -m > $@
+# Link standalone executable.
+%.run: %.o $(RUNTIME)
+	$(LANGS_CC) -o $@ $^
 
 clean:
 	@$(RM) *.o *.s *.run ||:
-	@echo "$(shell basename $(shell pwd)): cleaned!"
-
-%.test: %.run %.rkt
-	@test "$(shell ./$(<))" = "$(shell racket $(word 2,$^))"
+	@$(MAKE) -C $(RUNTIME_DIR) clean

@@ -7,14 +7,5 @@
   (match op
     ['add1 (add1 v)]
     ['sub1 (sub1 v)]
-    ['zero? (zero? v)]
-    ['not
-     ;; TODO
-     0]
-    ['-
-     ;; TODO
-     0]
-    ['abs
-     ;; TODO
-     0]))
+    ['zero? (zero? v)]))
 

@@ -13,14 +13,5 @@
      (seq (Cmp rax 0)
           (Mov rax (value->bits #f))
           (Mov r9  (value->bits #t))
-          (Cmove rax r9))]
-    ['abs
-     ;; TODO
-     (seq)]
-    ['-
-     ;; TODO
-     (seq)]
-    ['not
-     ;; TODO
-     (seq)]))
+          (Cmove rax r9))]))
 

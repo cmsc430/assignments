@@ -15,10 +15,7 @@
     [(If e1 e2 e3)
      (if (interp e1)
          (interp e2)
-         (interp e3))]
-    [(Cond eqs eas el)
-     ;; TODO
-     0]
+         (interp e3))]                     
     [(Case e ds es el)
      ;; TODO
      0]))
