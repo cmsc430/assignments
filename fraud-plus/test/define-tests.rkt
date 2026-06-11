@@ -93,7 +93,21 @@
     (check-equal? (run '(= (add1 4) 5)) #t)
     (check-equal? (run '(< 5 5)) #f)
     (check-equal? (run '(< 4 5)) #t)
-    (check-equal? (run '(< (add1 4) 5)) #f)))
+    (check-equal? (run '(< (add1 4) 5)) #f))
+
+  (begin ;; Fraud+
+    (check-equal? (run '(let ((x 1) (y 2)) x)) 1)
+    (check-equal? (run '(let ((x 1) (y 2)) y)) 2)
+    (check-equal? (run '(let ((x 1) (y 2)) (+ x y))) 3)
+    (check-equal? (run '(let* ((x 1) (y 2)) x)) 1)
+    (check-equal? (run '(let* ((x 1) (y 2)) y)) 2)
+    (check-equal? (run '(let* ((x 1) (y 2)) (+ x y))) 3)
+    (check-equal? (run '(let* ((x 1) (y (add1 x))) (+ x y))) 3)
+    (check-equal? (run '(integer? 3)) #t)
+    (check-equal? (run '(integer? #t)) #f)
+    (check-equal? (run '(boolean? #t)) #t)
+    (check-equal? (run '(boolean? #f)) #t)
+    (check-equal? (run '(boolean? 3)) #f)))
 
 (define (test/io run)
   (begin ;; Evildoer
