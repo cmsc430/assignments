@@ -16,7 +16,7 @@
         "dupe-plus-plus/test/run-interp-tests.rkt"
         "dupe-plus-plus/test/run-compile-tests.rkt"
         "extort-plus/test/run-interp-tests.rkt"
-        "extor-plus/test/run-compile-tests.rkt"
+        "extort-plus/test/run-compile-tests.rkt"
         "fraud-plus/test/run-interp-tests.rkt"
         "fraud-plus/test/run-compile-tests.rkt"
         "hoax-plus/test/run-compile-tests.rkt"
