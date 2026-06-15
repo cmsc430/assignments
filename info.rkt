@@ -15,6 +15,7 @@
         "dupe-plus/test/run-compile-tests.rkt"
         "dupe-plus-plus/test/run-interp-tests.rkt"
         "dupe-plus-plus/test/run-compile-tests.rkt"
+        "hoax-plus/test/run-compile-tests.rkt"        
         "iniquity-plus/test/run-compile-tests.rkt"
         "knock-plus/test/run-compile-tests.rkt"
         "hoax-plus/test/run-compile-tests.rkt"
