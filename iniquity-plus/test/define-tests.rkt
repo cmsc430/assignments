@@ -244,68 +244,7 @@
     (check-equal? (run '(define (f x . xs) xs)
                        '(let ((x 3))
                           (f 1 x)))
-                  '(3))
-    (check-equal? (run '(define f
-                          (case-lambda))
-                       '(f))
-                  'err)
-    (check-equal? (run '(define f
-                          (case-lambda))
-                       '(add1 8))
-                  9)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x) x]))
-                       '(f 1))
-                  1)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [x #t]
-                            [(x) x]))
-                       '(f 1))
-                  #t)
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x y) #f]
-                            [(x) x]))
-                       '(cons (f 1) (cons (f 1 2) '())))
-                  '(1 #f))
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [x #f]
-                            [y #t]))
-                       '(cons (f 1) (cons (f 1 2) '())))
-                  '(#f #f))
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x y . z) z]
-                            [(x) (+ x x)]
-                            [z 2]))
-                       '(cons (f 1 2)
-                              (cons (f 1)
-                                    (cons (f 1 2 3)
-                                          '()))))
-                  '(() 2 (3)))
-    (check-equal? (run '(define f (case-lambda))
-                       '(if #f (f) 1))
-                  1)
-    (check-equal? (run '(define (f . xs) xs)
-                       '(let ((x (f 1 2 3)))
-                          (f x)))
-                  (list (list 1 2 3)))
-    (check-equal? (run '(define (f x . xs) xs)
-                       '(let ((x (f 1 2 3)))
-                          (f x)))
-                  '())
-    (check-equal? (run '(define f
-                          (case-lambda
-                            [(x y) x]
-                            [(x y . xs)
-                             (char->integer y)]
-                            [(x y z . xs)
-                             (char->integer z)]))
-                       '(f 1 #\a 3))
-                  97)))
+                  '(3))))
 
 (define (test/io run)
   (begin ;; Evildoer

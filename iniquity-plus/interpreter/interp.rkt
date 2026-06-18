@@ -28,7 +28,7 @@
     (match p
       [(Prog ds e)
        (interp-e e '() ds)])))
-;l Expr Env Defns -> Value { raises 'err }
+;; Expr Env Defns -> Value { raises 'err }
 (define (interp-e e r ds) ;; where r closes e
   (match e
     [(Var x) (lookup r x)]
@@ -63,7 +63,7 @@
           [(Defn _ fun)
            (apply-fun fun vs ds)]))]))
 
-;; (Listof Expr) REnv Defns -> (Listof Value) { raises 'err }
+;; (Listof Expr) Env Defns -> (Listof Value) { raises 'err }
 (define (interp-e* es r ds)
   (match es
     ['() '()]
