@@ -59,9 +59,9 @@
           (Add rsp (* 8 (length xs)))
           (Ret))]
     [_ ;; TODO: handle other kinds of functions
-     (seq (seq (Label (symbol->label f))
-               ;; unimplemented
-               (Jmp 'err)))]))
+     (seq (Label (symbol->label f))
+          ;; unimplemented
+          (Jmp 'err))]))
 
 ;; type CEnv = (Listof [Maybe Id])
 ;; Expr CEnv -> Asm

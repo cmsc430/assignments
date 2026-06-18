@@ -1,7 +1,7 @@
 #lang racket
 (provide Lit Prim0 Prim1 Prim2 Prim3 If
          Eof Begin
-         Let Var Prog Defn App FunPlain FunRest FunCase)
+         Let Var Prog Defn App FunPlain FunRest)
 
 ;; type Prog = (Prog (Listof Defn) Expr)
 (struct Prog (ds e) #:prefab)
@@ -11,12 +11,8 @@
 
 ;; type Fun = (FunPlain [Listof Id] Expr)
 ;;          | (FunRest [Listof Id] Id Expr)
-;;          | (FunCase [Listof FunCaseClause])
-;; type FunCaseClause = (FunPlain [Listof Id] Expr)
-;;                    | (FunRest [Listof Id] Id Expr)
 (struct FunPlain (xs e)   #:prefab)
 (struct FunRest  (xs x e) #:prefab)
-(struct FunCase  (cs)     #:prefab)
 ;; type Expr = (Lit Datum)
 ;;           | (Eof)
 ;;           | (Prim0 Op0)

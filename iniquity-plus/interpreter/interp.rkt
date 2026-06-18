@@ -87,22 +87,7 @@
                    (zip (cons x xs)
                         (cons (drop vs (length xs))
                               (take vs (length xs))))
-                   ds))]
-    [(FunCase cs)
-     (apply-fun (select-case-lambda cs (length vs)) vs ds)]))
-
-;; [Listof FunCaseClause] Nat -> Fun { raises 'err }
-(define (select-case-lambda cs n)
-  (match cs
-    ['() (raise 'err)]
-    [(cons (and (FunPlain xs e) f) cs)
-     (if (= (length xs) n)
-         f
-         (select-case-lambda cs n))]
-    [(cons (and (FunRest xs x e) f) cs)
-     (if (<= (length xs) n)
-         f
-         (select-case-lambda cs n))]))
+                   ds))]))
 
 ;; Defns Symbol -> Defn
 (define (defns-lookup ds f)

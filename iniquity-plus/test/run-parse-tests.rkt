@@ -75,11 +75,5 @@
                 (Prog (list (Defn 'f (FunRest '() 'x (Var 'x)))) (Lit 1)))
   (check-exn exn:fail? (λ () (parse '(define (f x . x)) 1)))
   (check-exn exn:fail? (λ () (parse '(define (f x x . y)) 1)))
-  (check-exn exn:fail? (λ () (parse '(define (f . x)) '(define (f y) y) 1)))
-  (check-equal? (parse '(define f (case-lambda)) '(f))
-                (Prog (list (Defn 'f (FunCase '()))) (App 'f '())))
-  (check-exn exn:fail? (λ () (parse '(define case-lambda (case-lambda)) 1)))
-  (check-exn exn:fail? (λ () (parse '(define f (case-lambda [(x x) x])) 1)))
-  (check-equal? (parse '(define f (case-lambda [(x) x] [(x y) y])) 1)
-                (Prog (list (Defn 'f (FunCase (list (FunPlain '(x) (Var 'x)) (FunPlain '(x y) (Var 'y)))))) (Lit 1))))
+  (check-exn exn:fail? (λ () (parse '(define (f . x)) '(define (f y) y) 1))))
 

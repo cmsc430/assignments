@@ -79,25 +79,10 @@
 (provide (all-defined-out))
 (define (parse-define/acc s fs xs ys gs)
   (match s
-    [(list 'define (? symbol? f) (cons (? (not-in (append fs xs)) 'case-lambda) sr))
-     (match (parse-case-lambda/acc sr fs xs ys gs)
-       [(list ys gs fun)
-        (list ys gs (Defn f fun))])]
     [(cons 'define (cons (cons (? symbol? f) ps) sr))
      (match (parse-define-plain-or-rest-fun/acc (cons ps sr) fs xs ys gs)
        [(list ys gs fun)
         (list ys gs (Defn f fun))])]
-    [_ (error "parse error")]))
-
-(define (parse-case-lambda/acc s fs xs ys gs)
-  (match s
-    ['() (list ys gs (FunCase '()))]
-    [(cons s sr)
-     (match (parse-define-plain-or-rest-fun/acc s fs xs ys gs)
-       [(list ys gs l)
-        (match (parse-case-lambda/acc sr fs xs ys gs)
-          [(list ys gs (FunCase ls))
-           (list ys gs (FunCase (cons l ls)))])])]
     [_ (error "parse error")]))
 
 (define (parse-define-plain-or-rest-fun/acc s fs xs ys gs)
