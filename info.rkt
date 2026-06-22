@@ -25,4 +25,5 @@
         "knock-plus/test/run-compile-tests.rkt"
         "hoax-plus/test/run-compile-tests.rkt"
         "loot-exceptions/test/run-compile-tests.rkt"
-        "loot-bignums/test/run-compile-tests.rkt"))
+        "loot-bignums/test/run-compile-tests.rkt"
+        "practice-e1/6/fraud/ast.rkt"))
