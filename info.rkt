@@ -21,6 +21,7 @@
         "fraud-plus/test/run-compile-tests.rkt"
         "hoax-plus/test/run-compile-tests.rkt"
         "iniquity-plus/test/run-compile-tests.rkt"
+        "jig-plus/test/run-compile-tests.rkt"        
         "knock-plus/test/run-compile-tests.rkt"
         "hoax-plus/test/run-compile-tests.rkt"
         "loot-exceptions/test/run-compile-tests.rkt"
